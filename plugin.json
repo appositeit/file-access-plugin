@@ -7,41 +7,38 @@
   "implementationType": "javascript",
   "userSettings": "{}",
   "openaiSpec": {
-    "type": "function",
-    "function": {
-      "name": "file_access_plugin",
-      "description": "A plugin that provides local file system access capabilities for reading, writing, and managing files and directories.",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "command": {
-            "type": "string",
-            "enum": ["readFile", "writeFile", "listFiles", "toggleFileDebug", "requestDirectoryAccess", "listDirectories", "switchDirectory", "removeDirectory"],
-            "description": "The command to execute"
-          },
-          "args": {
-            "type": "object",
-            "properties": {
-              "path": {
-                "type": "string",
-                "description": "Path to the file, relative to the selected directory"
-              },
-              "content": {
-                "type": "string",
-                "description": "Content to write to the file"
-              },
-              "directory": {
-                "type": "string",
-                "description": "Path to the directory to list files from, relative to the selected directory"
-              },
-              "id": {
-                "type": "string",
-                "description": "ID of the directory to switch to or remove"
-              }
+    "name": "file_access_plugin",
+    "description": "A plugin that provides local file system access capabilities for reading, writing, and managing files and directories.",
+    "parameters": {
+      "type": "object",
+      "required": ["command"],
+      "properties": {
+        "command": {
+          "type": "string",
+          "enum": ["readFile", "writeFile", "listFiles", "toggleFileDebug", "requestDirectoryAccess", "listDirectories", "switchDirectory", "removeDirectory"],
+          "description": "The command to execute"
+        },
+        "args": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Path to the file, relative to the selected directory"
+            },
+            "content": {
+              "type": "string",
+              "description": "Content to write to the file"
+            },
+            "directory": {
+              "type": "string",
+              "description": "Path to the directory to list files from, relative to the selected directory"
+            },
+            "id": {
+              "type": "string",
+              "description": "ID of the directory to switch to or remove"
             }
           }
-        },
-        "required": ["command"]
+        }
       }
     }
   }
