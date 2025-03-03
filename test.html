@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Access Plugin Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .test-section {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .result {
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      white-space: pre-wrap;
+    }
+    button {
+      padding: 8px 12px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .directory-status {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>File Access Plugin Test</h1>
+  <p>This page tests the merged implementation of the File Access Plugin.</p>
+  
+  <div class="test-section">
+    <h2>Plugin Status</h2>
+    <div id="plugin-status" class="result">Loading plugin...</div>
+    <button id="initialize-plugin">Initialize Plugin</button>
+  </div>
+  
+  <div class="test-section">
+    <h2>Debug Controls</h2>
+    <button id="toggle-debug">Toggle Debug Mode</button>
+    <div id="debug-status" class="result">Debug mode: unknown</div>
+  </div>
+  
+  <div class="test-section">
+    <h2>Directory Access</h2>
+    <button id="request-directory">Request Directory Access</button>
+    <div id="directory-status" class="directory-status">No directory access granted</div>
+    <div id="directory-result" class="result">Results will appear here</div>
+  </div>
+  
+  <script>
+    // Load the implementation directly
+    function loadPlugin() {
+      try {
+        // Create a function from the implementation code
+        const getPluginClass = new Function(`
+          // Implementation code will be inserted here
+          ${document.getElementById('implementation-code').textContent}
+        `);
+        
+        // Get the plugin class
+        const PluginClass = getPluginClass();
+        
+        // Create an instance of the plugin
+        const plugin = new PluginClass();
+        
+        // Update the status
+        document.getElementById('plugin-status').textContent = 
+          `Plugin loaded successfully!\nName: ${plugin.name}\nVersion: ${plugin.version}`;
+        
+        // Mock TypingMind API
+        const mockApi = {
+          registerCommand: (name, callback, description) => {
+            console.log(`Registered command: ${name} - ${description}`);
+          }
+        };
+        
+        // Initialize button
+        document.getElementById('initialize-plugin').addEventListener('click', () => {
+          // Initialize the plugin
+          plugin.initialize(mockApi);
+          document.getElementById('plugin-status').textContent += 
+            `\n\nPlugin initialized successfully!`;
+          console.log('Plugin initialized:', plugin);
+        });
+        
+        // Debug toggle
+        document.getElementById('toggle-debug').addEventListener('click', async () => {
+          try {
+            const result = await plugin.toggleDebug();
+            document.getElementById('debug-status').textContent = result.message;
+          } catch (error) {
+            document.getElementById('debug-status').textContent = 
+              `Error: ${error.message}`;
+          }
+        });
+        
+        // Request directory access
+        document.getElementById('request-directory').addEventListener('click', async () => {
+          try {
+            const result = await plugin.requestDirectoryAccess();
+            document.getElementById('directory-result').textContent = 
+              JSON.stringify(result, null, 2);
+            
+            if (result.success) {
+              document.getElementById('directory-status').textContent = 
+                `Access granted to: ${result.directory}`;
+            } else {
+              document.getElementById('directory-status').textContent = 
+                'Directory access denied';
+            }
+          } catch (error) {
+            document.getElementById('directory-result').textContent = 
+              `Error: ${error.message}`;
+          }
+        });
+      } catch (error) {
+        document.getElementById('plugin-status').textContent = 
+          `Error loading plugin: ${error.message}`;
+        console.error('Error loading plugin:', error);
+      }
+    }
+    
+    // Fetch the implementation.js file
+    fetch('./implementation.js')
+      .then(response => response.text())
+      .then(code => {
+        // Create a hidden script element with the implementation code
+        const script = document.createElement('script');
+        script.id = 'implementation-code';
+        script.type = 'text/plain';
+        script.textContent = code;
+        document.head.appendChild(script);
+        
+        // Load the plugin
+        loadPlugin();
+      })
+      .catch(error => {
+        document.getElementById('plugin-status').textContent = 
+          `Error fetching implementation: ${error.message}`;
+        console.error('Error fetching implementation:', error);
+      });
+  </script>
+</body>
+</html> 

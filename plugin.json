@@ -1,0 +1,467 @@
+{
+  "version": 1,
+  "uuid": "file-access-plugin-v1",
+  "iconURL": "https://cdn.iconscout.com/icon/free/png-512/free-tabs-icon-download-in-svg-png-gif-file-formats--ui-elements-pack-user-interface-icons-444283.png?f=webp&w=128",
+  "emoji": "📁",
+  "title": "File Access Plugin",
+  "implementationType": "javascript",
+  "userSettings": "{}",
+  "openaiSpec": {
+    "openapi": "3.0.0",
+    "info": {
+      "title": "File Access Plugin API",
+      "description": "API for accessing and manipulating files on the local file system",
+      "version": "1.0.0"
+    },
+    "servers": [
+      {
+        "url": "https://typingmind.com/plugins/file-access"
+      }
+    ],
+    "paths": {
+      "/readFile": {
+        "post": {
+          "summary": "Read a file from the local file system",
+          "operationId": "readFile",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "description": "Path to the file, relative to the selected directory"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "File content retrieved successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/FileResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid request",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/writeFile": {
+        "post": {
+          "summary": "Write content to a file",
+          "operationId": "writeFile",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["path", "content"],
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "description": "Path to the file, relative to the selected directory"
+                    },
+                    "content": {
+                      "type": "string",
+                      "description": "Content to write to the file"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "File written successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid request",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/listFiles": {
+        "post": {
+          "summary": "List files in a directory",
+          "operationId": "listFiles",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "directory": {
+                      "type": "string",
+                      "description": "Path to the directory to list files from, relative to the selected directory"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Files listed successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/FileListResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid request",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/requestDirectoryAccess": {
+        "post": {
+          "summary": "Request access to a directory",
+          "operationId": "requestDirectoryAccess",
+          "responses": {
+            "200": {
+              "description": "Directory access granted",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/DirectoryAccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Access denied or error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/listDirectories": {
+        "post": {
+          "summary": "List all stored directories",
+          "operationId": "listDirectories",
+          "responses": {
+            "200": {
+              "description": "Directories listed successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/DirectoryListResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/switchDirectory": {
+        "post": {
+          "summary": "Switch to a different stored directory",
+          "operationId": "switchDirectory",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["id"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "ID of the directory to switch to"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Directory switched successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid request",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/removeDirectory": {
+        "post": {
+          "summary": "Remove a stored directory",
+          "operationId": "removeDirectory",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["id"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "ID of the directory to remove"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Directory removed successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid request",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/toggleFileDebug": {
+        "post": {
+          "summary": "Toggle debug mode",
+          "operationId": "toggleFileDebug",
+          "responses": {
+            "200": {
+              "description": "Debug mode toggled successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SuccessResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "FileResponse": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["file"]
+            },
+            "content": {
+              "type": "string",
+              "description": "Content of the file"
+            },
+            "name": {
+              "type": "string",
+              "description": "Name of the file"
+            },
+            "size": {
+              "type": "string",
+              "description": "Size of the file in human-readable format"
+            },
+            "message": {
+              "type": "string",
+              "description": "Success message"
+            }
+          }
+        },
+        "FileListResponse": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["fileList"]
+            },
+            "files": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the file or directory"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": ["file", "directory"],
+                    "description": "Type of the item"
+                  },
+                  "size": {
+                    "type": "string",
+                    "description": "Size of the file in human-readable format (for files only)"
+                  }
+                }
+              }
+            },
+            "directory": {
+              "type": "string",
+              "description": "Current directory path"
+            },
+            "hasDirectoryAccess": {
+              "type": "boolean",
+              "description": "Whether directory access is granted"
+            },
+            "rootDirectory": {
+              "type": "string",
+              "description": "Name of the root directory"
+            },
+            "message": {
+              "type": "string",
+              "description": "Success message"
+            }
+          }
+        },
+        "DirectoryAccessResponse": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "description": "Whether the operation was successful"
+            },
+            "directory": {
+              "type": "string",
+              "description": "Name of the directory"
+            },
+            "message": {
+              "type": "string",
+              "description": "Success or error message"
+            }
+          }
+        },
+        "DirectoryListResponse": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["directoryList"]
+            },
+            "directories": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Unique identifier for the directory"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the directory"
+                  },
+                  "hasPermission": {
+                    "type": "boolean",
+                    "description": "Whether permission is granted for this directory"
+                  }
+                }
+              }
+            },
+            "message": {
+              "type": "string",
+              "description": "Success message"
+            }
+          }
+        },
+        "SuccessResponse": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "description": "Whether the operation was successful"
+            },
+            "message": {
+              "type": "string",
+              "description": "Success message"
+            }
+          }
+        },
+        "ErrorResponse": {
+          "type": "object",
+          "properties": {
+            "error": {
+              "type": "boolean",
+              "enum": [true],
+              "description": "Indicates an error occurred"
+            },
+            "message": {
+              "type": "string",
+              "description": "Error message"
+            }
+          }
+        }
+      }
+    }
+  }
+} 
